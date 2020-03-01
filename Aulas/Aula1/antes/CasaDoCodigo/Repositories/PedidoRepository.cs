@@ -19,10 +19,11 @@ namespace CasaDoCodigo.Repositories
     public class PedidoRepository : BaseRepository<Pedido>, IPedidoRepository
     {
         private readonly IHttpContextAccessor contextAccessor;
-        private readonly ItemPedidoRepository itemPedidoRepository;
+        private readonly IItemPedidoRepository itemPedidoRepository;
 
         public PedidoRepository(ApplicationContext contexto,
-            IHttpContextAccessor contextAccessor, ItemPedidoRepository itemPedidoRepository) : base(contexto)
+            IHttpContextAccessor contextAccessor, 
+            IItemPedidoRepository itemPedidoRepository) : base(contexto)
         {
             this.contextAccessor = contextAccessor;
             this.itemPedidoRepository = itemPedidoRepository;
@@ -93,6 +94,11 @@ namespace CasaDoCodigo.Repositories
             if (itemPedidoDb != null)
             {
                 itemPedidoDb.AtualizaQuantidade(itemPedido.Quantidade);
+
+                if (itemPedido.Quantidade == 0)
+                {
+                    itemPedidoRepository.RemoveItemPedido(itemPedido.Id);
+                }
                 contexto.SaveChanges();
                 var carrinhoVM = new CarrinhoViewModel(GetPedido().Itens) ;
                 return new UpdateQuantidadeResponse(itemPedidoDb, carrinhoVM);
