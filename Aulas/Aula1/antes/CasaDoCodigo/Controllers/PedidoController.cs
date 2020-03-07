@@ -42,12 +42,21 @@ namespace CasaDoCodigo.Controllers
 
         public IActionResult Cadastro()
         {
+            var pedido = pedidoRepository.GetPedido();
+
+            if(pedido == null)
+                return RedirectToAction("Carrossel");
             return View();
         }
 
-        public IActionResult Resumo()
+        [HttpPost]
+        public IActionResult Resumo(Cadastro cadastro)
         {
-            return View(pedidoRepository.GetPedido());
+            if (ModelState.IsValid)
+            {
+                return View(pedidoRepository.UpdateCadastro(cadastro));
+            }
+            return RedirectToAction("Cadastro");
         }
 
         [HttpPost]
